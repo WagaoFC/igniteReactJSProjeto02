@@ -11,12 +11,23 @@ import {
 } from './styles'
 
 export function Home() {
-    const { register, handleSubmit, watch } = useForm()
+    interface NewCycleFormData {
+        task: string
+        minutesAmount: number
+    }
+
+    const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
+        defaultValues: {
+            task: '',
+            minutesAmount: 0,
+        },
+    })
     const task = watch('task')
     const isSubmitDisabled = !task
 
-    function handleCreateNewCycle(data: any) {
+    function handleCreateNewCycle(data: NewCycleFormData) {
         console.log(data)
+        reset()
     }
 
     return (
