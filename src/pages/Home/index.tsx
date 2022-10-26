@@ -1,4 +1,5 @@
 import { Play } from 'phosphor-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
     CountdownContainer,
@@ -10,25 +11,44 @@ import {
     TaskInput,
 } from './styles'
 
-export function Home() {
-    interface NewCycleFormData {
-        task: string
-        minutesAmount: number
-    }
+interface NewCycleFormData {
+    task: string
+    minutesAmount: number
+}
 
+interface Cycle {
+    id: string,
+    task: string,
+    minutesAmount: number
+}
+
+export function Home() {
+    const [cycle, setCycle] = useState<Cycle>([])
+    const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
     const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
         defaultValues: {
             task: '',
             minutesAmount: 0,
         },
     })
-    const task = watch('task')
-    const isSubmitDisabled = !task
 
     function handleCreateNewCycle(data: NewCycleFormData) {
-        console.log(data)
+        const id = String(new Date().getTime())
+        const newCycle: Cycle = {
+            id,
+            task: data.task,
+            minutesAmount: data.minutesAmount,
+        }
+
+        setCycle((state) => [...state, newCycle])
+        setActiveCycleId(id)
         reset()
     }
+
+    const activeCycle = cycle.find((cycle) => cycle.id === activeCycleId)
+    console.log(activeCycle)
+    const task = watch('task')
+    const isSubmitDisabled = !task
 
     return (
         <HomeContainer>
