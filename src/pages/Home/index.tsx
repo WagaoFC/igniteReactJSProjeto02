@@ -23,7 +23,7 @@ interface Cycle {
 }
 
 export function Home() {
-    const [cycle, setCycle] = useState<Cycle>([])
+    const [cycle, setCycle] = useState<Cycle[]>([])
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
     const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
         defaultValues: {
