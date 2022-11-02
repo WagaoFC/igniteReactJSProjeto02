@@ -5,14 +5,9 @@ import { differenceInSeconds } from 'date-fns'
 import { NewCycleForm } from './components/NewCycleForm'
 import { Countdown } from './components/Countdown'
 import {
-    CountdownContainer,
-    FormContainer,
     HomeContainer,
-    MinutesAmountInput,
-    Separator,
     StartCountdownButton,
     StopCountdownButton,
-    TaskInput,
 } from './styles'
 
 interface NewCycleFormData {
@@ -23,7 +18,6 @@ interface NewCycleFormData {
 interface Cycle {
     id: string,
     task: string,
-    minutesAmount: number,
     startDate: Date,
     interruptedDate?: Date,
     finishedDate?: Date
@@ -32,51 +26,7 @@ interface Cycle {
 export function Home() {
     const [cycle, setCycle] = useState<Cycle[]>([])
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-    const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
-    const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
-        defaultValues: {
-            task: '',
-            minutesAmount: 0,
-        },
-    })
-
     const activeCycle = cycle.find((cycle) => cycle.id === activeCycleId)
-    const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
-
-    useEffect(() => {
-        let interval: number
-
-        if (activeCycle) {
-            interval = setInterval(() => {
-                const secondsDifference = differenceInSeconds(
-                    new Date(),
-                    activeCycle.startDate,
-                )
-
-                if (secondsDifference >= totalSeconds) {
-                    setCycle((state) =>
-                        state.map((cycle) => {
-                            if (cycle.id === activeCycleId) {
-                                return { ...cycle, finishedDate: new Date() }
-                            } else {
-                                return cycle
-                            }
-                        }),
-                    )
-                    setAmountSecondsPassed(totalSeconds)
-                    clearInterval(interval)
-                } else {
-                    setAmountSecondsPassed(secondsDifference)
-                }
-
-            }, 1000)
-        }
-
-        return () => {
-            clearInterval(interval)
-        }
-
-    }, [activeCycle, totalSeconds, activeCycleId])
 
     function handleCreateNewCycle(data: NewCycleFormData) {
         const id = String(new Date().getTime())

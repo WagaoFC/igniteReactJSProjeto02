@@ -1,6 +1,14 @@
+import { useForm } from 'react-hook-form'
 import { FormContainer, MinutesAmountInput, TaskInput } from "./styles";
 
 export function NewCycleForm() {
+    const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
+        defaultValues: {
+            task: '',
+            minutesAmount: 0,
+        },
+    })
+
     return (
         <FormContainer>
             <label htmlFor="task">Vou trabalhar em</label>
