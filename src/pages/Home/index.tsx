@@ -18,6 +18,7 @@ interface NewCycleFormData {
 interface Cycle {
     id: string,
     task: string,
+    minutesAmount: number,
     startDate: Date,
     interruptedDate?: Date,
     finishedDate?: Date
@@ -25,7 +26,8 @@ interface Cycle {
 
 interface CylesContextType {
     activeCycle: Cycle | undefined
-    activeCycleId: string | undefined
+    activeCycleId: string | null
+    markCurrentCycleAsFinished: () => void
 }
 
 export const CyclesContext = createContext({} as CylesContextType)
@@ -35,20 +37,32 @@ export function Home() {
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
     const activeCycle = cycle.find((cycle) => cycle.id === activeCycleId)
 
-    function handleCreateNewCycle(data: NewCycleFormData) {
-        const id = String(new Date().getTime())
-        const newCycle: Cycle = {
-            id,
-            task: data.task,
-            minutesAmount: data.minutesAmount,
-            startDate: new Date(),
-        }
-
-        setCycle((state) => [...state, newCycle])
-        setActiveCycleId(id)
-        setAmountSecondsPassed(0)
-        reset()
+    function markCurrentCycleAsFinished() {
+        setCycle((state) =>
+            state.map((cycle) => {
+                if (cycle.id === activeCycleId) {
+                    return { ...cycle, finishedDate: new Date() }
+                } else {
+                    return cycle
+                }
+            }),
+        )
     }
+
+    // function handleCreateNewCycle(data: NewCycleFormData) {
+    //     const id = String(new Date().getTime())
+    //     const newCycle: Cycle = {
+    //         id,
+    //         task: data.task,
+    //         minutesAmount: data.minutesAmount,
+    //         startDate: new Date(),
+    //     }
+
+    //     setCycle((state) => [...state, newCycle])
+    //     setActiveCycleId(id)
+    //     setAmountSecondsPassed(0)
+    //     reset()
+    // }
 
     function handleInterruptCycle() {
         setCycle((state) =>
@@ -63,14 +77,14 @@ export function Home() {
         setActiveCycleId(null)
     }
 
-    const task = watch('task')
-    const isSubmitDisabled = !task
+    // const task = watch('task')
+    // const isSubmitDisabled = !task
 
     return (
         <HomeContainer>
-            <form onSubmit={handleSubmit(handleCreateNewCycle)}>
-                <CyclesContext.Provider value={{ activeCycle, activeCycleId }}>
-                    <NewCycleForm />
+            <form /*onSubmit={handleSubmit(handleCreateNewCycle)}*/>
+                <CyclesContext.Provider value={{ activeCycle, activeCycleId, markCurrentCycleAsFinished }}>
+                    {/* <NewCycleForm /> */}
                     <Countdown />
                 </CyclesContext.Provider>
                 {activeCycle ? (
@@ -79,7 +93,7 @@ export function Home() {
                         Interromper
                     </StopCountdownButton>
                 ) : (
-                    <StartCountdownButton disabled={isSubmitDisabled} type="submit">
+                    <StartCountdownButton /*disabled={isSubmitDisabled}*/ type="submit">
                         <Play size={24} />
                         Começar
                     </StartCountdownButton>
