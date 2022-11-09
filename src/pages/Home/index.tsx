@@ -1,5 +1,5 @@
 import { HandPalm, Play } from 'phosphor-react'
-import { useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { differenceInSeconds } from 'date-fns'
 import { NewCycleForm } from './components/NewCycleForm'
@@ -22,6 +22,13 @@ interface Cycle {
     interruptedDate?: Date,
     finishedDate?: Date
 }
+
+interface CylesContextType {
+    activeCycle: Cycle | undefined
+    activeCycleId: string | undefined
+}
+
+export const CyclesContext = createContext({} as CylesContextType)
 
 export function Home() {
     const [cycle, setCycle] = useState<Cycle[]>([])
@@ -56,25 +63,16 @@ export function Home() {
         setActiveCycleId(null)
     }
 
-    const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
-    const minutesAmount = Math.floor(currentSeconds / 60)
-    const secondsAmount = currentSeconds % 60
-    const minutes = String(minutesAmount).padStart(2, '0')
-    const seconds = String(secondsAmount).padStart(2, '0')
     const task = watch('task')
     const isSubmitDisabled = !task
-
-    useEffect(() => {
-        if (activeCycle) {
-            document.title = `⏰ ${minutes}:${seconds}`
-        }
-    }, [minutes, seconds, activeCycle])
 
     return (
         <HomeContainer>
             <form onSubmit={handleSubmit(handleCreateNewCycle)}>
-                <NewCycleForm />
-                <Countdown />
+                <CyclesContext.Provider value={{ activeCycle, activeCycleId }}>
+                    <NewCycleForm />
+                    <Countdown />
+                </CyclesContext.Provider>
                 {activeCycle ? (
                     <StopCountdownButton onClick={handleInterruptCycle} type="button">
                         <HandPalm size={24} />
