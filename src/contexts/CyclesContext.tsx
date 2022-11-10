@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react"
+import { createContext, ReactNode, useReducer, useState } from "react"
 
 interface CreateCycleData {
     task: string;
@@ -32,7 +32,14 @@ interface CyclesContextProviderProps {
 }
 
 export function CyclesContextProvider({ children }: CyclesContextProviderProps) {
-    const [cycle, setCycle] = useState<Cycle[]>([])
+    const [cycle, displatch] = useReducer((state: Cycle[], action: any) => {
+        if (action.type === 'ADD_NEW_CYCLE') {
+            return [...state, action.payload.newCycle]
+        }
+
+        return state
+    }, [])
+
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
     const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
     const activeCycle = cycle.find((cycle) => cycle.id === activeCycleId)
@@ -42,15 +49,22 @@ export function CyclesContextProvider({ children }: CyclesContextProviderProps) 
     }
 
     function markCurrentCycleAsFinished() {
-        setCycle((state) =>
-            state.map((cycle) => {
-                if (cycle.id === activeCycleId) {
-                    return { ...cycle, finishedDate: new Date() }
-                } else {
-                    return cycle
-                }
-            }),
-        )
+        displatch({
+            type: 'MARK_CURRENT_CYCLE_AS_FINISHED',
+            payload: {
+                activeCycleId,
+            }
+        })
+
+        // setCycle((state) =>
+        //     state.map((cycle) => {
+        //         if (cycle.id === activeCycleId) {
+        //             return { ...cycle, finishedDate: new Date() }
+        //         } else {
+        //             return cycle
+        //         }
+        //     }),
+        // )
     }
 
     function createNewCycle(data: CreateCycleData) {
@@ -62,21 +76,35 @@ export function CyclesContextProvider({ children }: CyclesContextProviderProps) 
             startDate: new Date(),
         }
 
-        setCycle((state) => [...state, newCycle])
+        displatch({
+            type: 'ADD_NEW_CYCLE',
+            payload: {
+                newCycle,
+            }
+        })
+
+        // setCycle((state) => [...state, newCycle])
         setActiveCycleId(id)
         setAmountSecondsPassed(0)
     }
 
     function interruptCurrentCycle() {
-        setCycle((state) =>
-            state.map((cycle) => {
-                if (cycle.id === activeCycleId) {
-                    return { ...cycle, interruptedDate: new Date() }
-                } else {
-                    return cycle
-                }
-            }),
-        )
+        displatch({
+            type: 'INTERRUPT_NEW_CYCLE',
+            payload: {
+                activeCycleId,
+            }
+        })
+
+        // setCycle((state) =>
+        //     state.map((cycle) => {
+        //         if (cycle.id === activeCycleId) {
+        //             return { ...cycle, interruptedDate: new Date() }
+        //         } else {
+        //             return cycle
+        //         }
+        //     }),
+        // )
         setActiveCycleId(null)
     }
 
