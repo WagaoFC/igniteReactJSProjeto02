@@ -46,7 +46,7 @@ export function CyclesContextProvider({ children }: CyclesContextProviderProps) 
             }
         }
 
-        if (action.type === 'INTERRUPT_CURRENT_CYLE') {
+        if (action.type === 'INTERRUPT_CURRENT_CYCLE') {
             return {
                 ...state,
                 cycles: state.cycles.map((cycle) => {
